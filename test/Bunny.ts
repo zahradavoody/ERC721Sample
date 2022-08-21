@@ -11,140 +11,111 @@ function generateAccounts(count: number): string[] {
 
 describe("Bunny", function () {
 
-  describe("owner", function () {
-
-    it("Should check contract owner", async function () {
-      const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
-      const bunny = await Bunny.deploy();
-      // assert that the value is correct
-      expect(await bunny.owner()).to.equal("0x7716b4A9aB9330C9D619B7D238a205c004aA1Eaf");
-    });
-  });
-
   describe("BaseURI", function () {
-    it("Should check baseURI value which set via constructor", async function () {
-      const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
-      const bunny = await Bunny.deploy();
-      // assert that the value is correct
-      // @ts-ignore
-      expect(await bunny.baseURI()).to.equal();
-    });
 
     it("Should check setBaseURI method", async function () {
       const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
       const bunny = await Bunny.deploy();
 
       await bunny.setBaseURI("http://api2.bunny.example.com/");
-      // assert that the value is correct
-      // @ts-ignore
       expect(await bunny.baseURI()).to.equal("http://api2.bunny.example.com/");
-      // @ts-ignore
-      expect(await bunny.baseURI()).to.not.equal();
     });
   });
 
-  describe("redeemer", function () {
-    it("Should add a redeemer", async function () {
+  describe("whitelist", function () {
+    it("Should add to whitelist", async function () {
       const [owner, otherAccount] = await ethers.getSigners();
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
-      await bunny.addRedeemer(otherAccount.address);
+
+      await bunny.addToWhitelist(otherAccount.address);
       expect(await bunny.isWhitelisted(otherAccount.address)).to.be.true;
     });
 
-    it("Should remove a redeemer", async function () {
+    it("Should remove from whitelist", async function () {
       const [owner, otherAccount] = await ethers.getSigners();
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
 
-      await bunny.addRedeemer(otherAccount.address);
-      expect(await bunny.isWhitelisted(otherAccount.address)).to.be.true;
-      await bunny.removeRedeemer(otherAccount.address);
+      await bunny.addToWhitelist(otherAccount.address);
+      await bunny.removeFromWhitelist(otherAccount.address);
       expect(await bunny.isWhitelisted(otherAccount.address)).to.be.false;
     });
 
-    it("Should bulk add redeemers", async function () {
+    it("Should bulk add to whitelist", async function () {
       const [owner, otherAccount] = await ethers.getSigners();
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
+
       const addresses = generateAccounts(250);
-      await bunny.bulkAddRedeemers(addresses);
+      await bunny.bulkAddToWhitelist(addresses);
       for (const address of addresses) {
         expect(await bunny.isWhitelisted(address)).to.be.true;
       }
     });
 
-    it("Should bulk remove redeemers", async function () {
+    it("Should bulk remove from whitelist", async function () {
       const [owner, otherAccount] = await ethers.getSigners();
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
+
       const addresses = generateAccounts(250);
-      await bunny.bulkAddRedeemers(addresses);
-      await bunny.bulkRemoveRedeemers(addresses);
+      await bunny.bulkAddToWhitelist(addresses);
+      await bunny.bulkRemoveFromWhitelist(addresses);
       for (const address of addresses) {
         expect(await bunny.isWhitelisted(address)).to.be.false;
       }
     });
   })
 
-  describe("redeemMint", function () {
+  describe("giftMint", function () {
     it("Should call with non-privileged account", async function () {
-
       const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
       const bunny = await Bunny.deploy();
-
       const [owner, otherAccount] = await ethers.getSigners();
-      await bunny.toggleRedeemOpened();
-      await expect(bunny.connect(otherAccount).redeemMint(2)).to.be.revertedWithoutReason();
+
+      await bunny.toggleGiftOpened();
+      await expect(bunny.connect(otherAccount).giftMint(2)).to.be.revertedWithoutReason();
       await expect(await bunny.balanceOf(otherAccount.address)).to.be.equal(0);
     });
 
     it("Should call with privileged account", async function () {
       const [owner, otherAccount] = await ethers.getSigners();
-
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
 
-      await bunny.addRedeemer(otherAccount.address);
-      await bunny.toggleRedeemOpened();
-      await expect(await bunny.connect(otherAccount).redeemMint(2)).not.to.be.reverted;
+      await bunny.addToWhitelist(otherAccount.address);
+      await bunny.toggleGiftOpened();
+      await expect(await bunny.connect(otherAccount).giftMint(2)).not.to.be.reverted;
       await expect(await bunny.balanceOf(otherAccount.address)).to.be.equal(2);
     });
-
-    /*it("Should call with invalid count", async function () {
-      const [owner, otherAccount] = await ethers.getSigners();
-
-      const Bunny = await hre.ethers.getContractFactory("Bunny");
-      const bunny = await Bunny.deploy();
-
-      await bunny.addRedeemer(otherAccount.address);
-      await bunny.toggleRedeemOpened();
-      await expect(await bunny.connect(otherAccount).redeemMint(251)).to.be.reverted;
-    });*/
   });
 
   describe("mint", function () {
-    it("Should call invalid count", async function () {
-
+    it("Should call before minting open", async function () {
       const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
       const bunny = await Bunny.deploy();
-
       const [owner, otherAccount] = await ethers.getSigners();
-      await expect(bunny.connect(otherAccount).mint(30, {value: 0})).to.be.reverted;
-    })
+
+      await expect(bunny.connect(otherAccount).mint(1, {value: '10000000000000000'})).to.be.revertedWith("minting is not started");
+    });
+
+    it("Should call invalid count", async function () {
+      const Bunny = await hre.ethers.getContractFactory("Bunny");
+      const bunny = await Bunny.deploy();
+      const [owner, otherAccount] = await ethers.getSigners();
+
+      await bunny.start();
+      await expect(bunny.connect(otherAccount).mint(30, {value: '300000000000000000'})).to.be.revertedWith("max count is 20");
+    });
 
     it("Should call with insufficient value", async function () {
-
       const Bunny = await hre.ethers.getContractFactory("Bunny");
-      // @ts-ignore
       const bunny = await Bunny.deploy();
       const [owner, otherAccount] = await ethers.getSigners();
-      await expect(bunny.connect(otherAccount).mint(1, {value: 1000000000})).to.be.reverted;
+
+      await bunny.start();
+      await expect(bunny.connect(otherAccount).mint(3, {value: 1000000000})).to.be.revertedWith("invalid value");
     });
 
   });
@@ -154,7 +125,9 @@ describe("Bunny", function () {
       const Bunny = await hre.ethers.getContractFactory("Bunny");
       const bunny = await Bunny.deploy();
       const [owner, otherAccount] = await ethers.getSigners();
-      await bunny.connect(otherAccount).mint(1, {value: '55000000000000000'});
+
+      await bunny.start();
+      await bunny.connect(otherAccount).mint(1, {value: '10000000000000000'});
       await expect(await bunny.withdraw()).to.be.ok;
     });
   });

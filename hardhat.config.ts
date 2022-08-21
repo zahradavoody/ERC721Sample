@@ -6,7 +6,7 @@ import "@nomiclabs/hardhat-truffle5";
 import "@nomicfoundation/hardhat-chai-matchers";
 
 require('dotenv').config();
-const {RINKEBY_URL, PRIVATE_KEY} = process.env;
+const {ROPSTEN_URL, RINKEBY_URL, PRIVATE_KEY} = process.env;
 
 
 const config: HardhatUserConfig = {
@@ -35,6 +35,11 @@ const config: HardhatUserConfig = {
     rinkeby: {
       gasPrice: 40000000000,
       url: RINKEBY_URL,
+      accounts: [`${PRIVATE_KEY}`],
+    },
+    ropsten: {
+      gasPrice: 40000000000,
+      url: ROPSTEN_URL,
       accounts: [`${PRIVATE_KEY}`],
     }
   },

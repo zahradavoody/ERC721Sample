@@ -4,20 +4,17 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./RedeemerWhitelist.sol";
+import "./Whitelist.sol";
 
 
-//sample contracts
-// https://etherscan.io/address/0x14e0a1f310e2b7e321c91f58847e98b8c802f6ef#code
-
-contract Bunny is ERC721Enumerable, RedeemerWhitelist {
+contract Bunny is ERC721Enumerable, Whitelist {
     using SafeMath for uint256;
 
     uint256 private tokenId = 1;
-    uint256 private redeemRemainSupply = 250;
+    uint256 private giftRemainSupply = 250;
 
     bool public mintOpened;
-    bool public redeemOpened;
+    bool public giftOpened;
 
     //todo set correct url
     string public baseURI = "http://api.bunny.example.com/";
@@ -37,19 +34,19 @@ contract Bunny is ERC721Enumerable, RedeemerWhitelist {
         return baseURI;
     }
 
-    function redeemMint(uint _count) external onlyWhitelisted {
-        require(redeemOpened, "redeem is not active");
-        require(redeemRemainSupply >= _count, "invalid count");
+    function giftMint(uint _count) external onlyWhitelisted {
+        require(giftOpened, "redeem is not active");
+        require(giftRemainSupply >= _count, "invalid count");
 
         for (uint i = 0; i < _count; i++) {
             _safeMint(_msgSender(), tokenId);
             tokenId++;
         }
-        redeemRemainSupply = redeemRemainSupply.sub(_count);
+        giftRemainSupply = giftRemainSupply.sub(_count);
     }
 
-    function toggleRedeemOpened() external onlyOwner {
-        redeemOpened = !redeemOpened;
+    function toggleGiftOpened() external onlyOwner {
+        giftOpened = !giftOpened;
     }
 
     function mint(uint256 _count) external payable {
@@ -57,7 +54,7 @@ contract Bunny is ERC721Enumerable, RedeemerWhitelist {
         // check if count <= 20
         require(_count <= 20, "max count is 20");
         // check if tx.value is correct
-        require(0.055 ether * (_count) <= msg.value, "invalid value");
+        require(0.01 ether * (_count) <= msg.value, "invalid value");
         // check if total supply is not reaching max total supply after mint
         require(totalSupply().add(_count) <= 9750, "reached max supply");
 

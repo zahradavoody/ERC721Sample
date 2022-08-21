@@ -1,29 +1,8 @@
-# Sample Hardhat Project
+# Sample ERC721 Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project demonstrates a sample ERC721 smart contract. It comes with tests for that contract and a script that deploys that contract.
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
-
-# Steps to Create Project  
-```shell
-npm init
-npm install --save-dev hardhat
-```  
-## Initialize hardhat sample project  
-```shell
-npx hardhat
-```  
-Choose Typescript sample project and proceed to save dependencies.  
-
-#### Compile Project  
+### Compile Project  
 ```shell
 npx hardhat compile
 ```  
@@ -35,13 +14,9 @@ npx hardhat test
 
 ### Deploy Contract  
 ```shell
-npx hardhat run scripts/deploy.ts --network ganache
+npx hardhat run scripts/deploy.ts
 ```  
 
-### Verify Contract Source on Etherscan  
-See here:  
-https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan  
-Example:  
-```shell
-npx hardhat verify --network rinkeby 0x65b3ce52d95918b4e73afbf68306b0742c94e136 "http://api.bunny.example.com/"
-```
+_This contract is deployed on ropsten test network at **[0x35733373c01d7b0cf53824bb3ae6c1a503e1dd8d](https://ropsten.etherscan.io/address/0x35733373c01d7b0cf53824bb3ae6c1a503e1dd8d)**_
+  
+
