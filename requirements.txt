@@ -1,0 +1,7 @@
+Requirements:
+Price 0.055
+Tokens: 10000
+Reserve tokens : 250
+Max 20 per transaction mint limit
+
+PS:Whitelist nadarim
