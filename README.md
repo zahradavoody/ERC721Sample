@@ -1,7 +1,7 @@
 # Sample ERC721 Project
 
 This project demonstrates a sample ERC721 smart contract. It comes with tests for that contract and a script that deploys that contract.
-
+In this project only addresses that are in whitelist can mine. For this purpose we developed a whitelist smart contract that the main smart contract inherited from it.
 ### Compile Project  
 ```shell
 npx hardhat compile
